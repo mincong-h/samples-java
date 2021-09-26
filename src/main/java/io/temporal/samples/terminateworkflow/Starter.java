@@ -33,8 +33,14 @@ import io.temporal.worker.WorkerFactory;
 public class Starter {
 
   public static final String TASK_QUEUE = "terminateQueue";
+
   private static final WorkflowServiceStubs service = WorkflowServiceStubs.newInstance();
+
+  // client: talks to Temporal Server using gRPC
+  // https://github.com/temporalio/sdk-java/blob/7a437c02cb7e9a470dcaac941ba1801a06a5984a/temporal-serviceclient/build.gradle#L10-L14
   private static final WorkflowClient client = WorkflowClient.newInstance(service);
+
+  // factory: maintains worker creation and lifecycle.
   private static final WorkerFactory factory = WorkerFactory.newInstance(client);
 
   public static void main(String[] args) {
@@ -103,6 +109,8 @@ public class Starter {
             .build();
 
     DescribeWorkflowExecutionResponse resp =
+        // blockingStub:  sync execution
+        //   futureStub: async execution
         service.blockingStub().describeWorkflowExecution(describeWorkflowExecutionRequest);
 
     WorkflowExecutionInfo workflowExecutionInfo = resp.getWorkflowExecutionInfo();
